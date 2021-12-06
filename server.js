@@ -3,7 +3,9 @@ const axios = require('axios');
 const express = require('express')
 const app = express()
 const PORT = process.env.PORT || 5000
-const cors = require('cors')
+const cors = require('cors');
+const { format, parse } = require('date-fns')
+const { ru } = require('date-fns/locale')
 
 app.use(express.static('public'))
 app.use(cors())
@@ -146,9 +148,10 @@ function combineLeadsData(leadsData, contactsData, pipelinesData, usersData) {
       array[index].contacts.push(contactArr[0])
     })
     // Convert unix stamp to date
-    const timeStamp = lead.created_at * 1000
-    const dateVal = new Date(timeStamp).toLocaleDateString('en-GB');
-    array[index].created_time = dateVal
+    const secondsTimeStamp = lead.created_at
+    const parsedDate = parse(secondsTimeStamp, 't', Date.now())
+    const dataFomated = format(parsedDate, 'd MMMM yyyy', { locale: ru })
+    array[index].created_time = dataFomated
     
     // Add status object to lead
     const statusId = lead.status_id
